@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendMailJob;
 use App\Mail\SendEmail;
 use App\http\conroller\sendEmailController;
+use Illuminate\Support\Facades\Storage;
 
 class LoginRegisterController extends Controller
 {
@@ -28,26 +29,43 @@ class LoginRegisterController extends Controller
         return view('auth.register');
     }
 
+
     // Menyimpan data registrasi dan melakukan login
     public function store(Request $request)
-    {
+{
     $request->validate([
         'name' => 'required|string|max:250',
         'email' => 'required|email|unique:users|max:250',
-        'password' => 'required|confirmed|min:8'
+        'password' => 'required|confirmed|min:8',
+        'photo' => 'image|nullable|max:2048',
+        'level' => 'required|in:admin,user' // Validasi untuk level
     ]);
+
+    // Proses upload foto
+    if ($request->hasFile('photo')) {
+        $filenameWithExt = $request->file('photo')->getClientOriginalName();
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        $extension = $request->file('photo')->getClientOriginalExtension();
+        $filenameSimpan = $filename . '_' . time() . '.' . $extension;
+        $path = $request->file('photo')->storeAs('photos', $filenameSimpan);
+    } else {
+        $filenameSimpan = null;
+    }
 
     // Membuat pengguna baru
     User::create([
         'name' => $request->name,
         'email' => $request->email,
-        'password' => Hash::make($request->password)
+        'level' => $request->level, // Menyimpan nilai level
+        'password' => Hash::make($request->password),
+        'photo' => $filenameSimpan
     ]);
 
     // Persiapkan data untuk email
     $data = [
         'name' => $request->name,
         'email' => $request->email,
+        'level' => 'admin',
         'subject' => 'Registration Confirmation'
     ];
 

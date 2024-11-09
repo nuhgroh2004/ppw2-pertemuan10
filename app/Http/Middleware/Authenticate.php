@@ -14,4 +14,10 @@ class Authenticate extends Middleware
     {
         return $request->expectsJson() ? null : route('login');
     }
+
+    public function _construct()
+    {
+        $this->middleware('auth');
+    }
+
 }

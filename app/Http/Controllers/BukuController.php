@@ -74,7 +74,15 @@ class BukuController extends Controller
         $buku -> penulis = $request -> penulis;
         $buku -> harga = $request -> harga;
         $buku -> tahun_terbit = $request -> tahun_terbit;
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $buku->foto = $filename;
+        }
         $buku -> save();
+
 
         return redirect('/buku/index')-> with('successadd', 'Item added successfuly');
     }
@@ -134,22 +142,39 @@ class BukuController extends Controller
     // }
 
     public function update(Request $request, $id)
-    {
-        $this->validate($request, [
-            'judul' => 'required|string',
-            'penulis' => 'required|string|max:30',
-            'harga' => 'required|numeric',
-            'tahun_terbit' => 'required|date',
-        ]);
-        $buku = Buku::find($id);
-        $buku -> judul = $request -> input('judul');
-        $buku -> penulis = $request -> input('penulis');
-        $buku -> harga = $request -> input('harga');
-        $buku -> tahun_terbit = $request -> input('tahun_terbit');
-        $buku -> save();
+{
+    $this->validate($request, [
+        'judul' => 'required|string',
+        'penulis' => 'required|string|max:30',
+        'harga' => 'required|numeric',
+        'tahun_terbit' => 'required|date',
+    ]);
 
-        return redirect('/buku/index') -> with('successedit', 'Item updated successfuly');
+    $buku = Buku::find($id);
+    $buku->judul = $request->input('judul');
+    $buku->penulis = $request->input('penulis');
+    $buku->harga = $request->input('harga');
+    $buku->tahun_terbit = $request->input('tahun_terbit');
+
+    // Jika ada file foto baru diunggah
+    if ($request->hasFile('foto')) {
+        // Hapus foto lama jika ada
+        if ($buku->foto && file_exists(public_path('uploads/' . $buku->foto))) {
+            unlink(public_path('uploads/' . $buku->foto));
+        }
+
+        // Upload foto baru
+        $file = $request->file('foto');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads'), $filename);
+        $buku->foto = $filename;
     }
+
+    $buku->save();
+
+    return redirect('/buku/index')->with('successedit', 'Item updated successfully');
+}
+
 
     /**
      * Remove the specified resource from storage.

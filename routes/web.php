@@ -35,12 +35,11 @@ Route::controller(LoginRegisterController::class)->group(function() {
     Route::post('/authenticate', 'authenticate')->name('authenticate');
     Route::get('/dashboard', 'dashboard')->name('dashboard');
     Route::post('/logout', 'logout')->name('logout');
-   });
+});
 
 
 
-
-   Route::middleware('auth')->group(function() {
+Route::middleware(['auth', 'admin'])->group(function() {
     Route::controller(BukuController::class)->group(function() {
         Route::get('/buku/create', 'create')->name('buku.create');
         Route::post('/buku', 'store')->name('buku.store');
@@ -50,12 +49,12 @@ Route::controller(LoginRegisterController::class)->group(function() {
     });
 });
 
+
 Route::controller(BukuController::class)->group(function() {
     Route::get('/buku/index', 'index')->name('buku.index');
-    Route::get('/buku/create', 'create')->name('buku.create');
-    Route::post('/buku', 'store')->name('buku.store');
-    Route::delete('/buku/{id}', 'destroy')->name('buku.destroy');
-    Route::get('/buku/edit/{id}', 'edit')->name('buku.edit');
-    Route::put('/buku/{id}', 'update')->name('buku.update');
-    Route::get('/buku/search', 'search')->name('buku.search'); // Tambahkan ini jika belum ada
+    Route::get('/buku/search', 'search')->name('buku.search');
+});
+
+Route::get('/404', function () {
+    abort(404);
 });

@@ -8,6 +8,7 @@ return new class extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
+            $table->string('foto')->nullable();
             $table->string('penulis');
             $table->string('judul');
             $table->integer('harga');
