@@ -5,6 +5,7 @@ use App\Http\Controllers\SendEmailController;
 
 use App\Http\Controllers\Auth\LoginRegisterController;
 use App\Http\Controllers\BukuController;
+use App\Http\Controllers\GalleryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,3 +59,11 @@ Route::controller(BukuController::class)->group(function() {
 Route::get('/404', function () {
     abort(404);
 });
+
+Route::get('buku/lihatgambar/{filename}', [BukuController::class, 'lihatgambar'])->name('buku.lihatgambar') ->middleware('admin');
+
+Route::resource('gallery', GalleryController::class);
+
+
+Route::put('/gallery/{id}', [GalleryController::class, 'update'])->name('gallery.update');
+

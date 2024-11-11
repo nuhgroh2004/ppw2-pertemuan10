@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Buku;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BukuController extends Controller
 {
@@ -75,13 +76,17 @@ class BukuController extends Controller
         $buku -> harga = $request -> harga;
         $buku -> tahun_terbit = $request -> tahun_terbit;
 
+
         if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename);
-            $buku->foto = $filename;
+            $filenameWithExt = $request->file('foto')->getClientOriginalName();
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            $extension = $request->file('foto')->getClientOriginalExtension();
+            $filenameToSave = $filename . '_' . time() . '.' . $extension;
+            // $path = $request->file('photo')->storeAs('photos', $filenameToSave);
+            $request->file('foto')->storeAs('photos', $filenameToSave);
+            $buku -> foto = $filenameToSave;
         }
-        $buku -> save();
+        $buku->save();
 
 
         return redirect('/buku/index')-> with('successadd', 'Item added successfuly');
@@ -159,15 +164,17 @@ class BukuController extends Controller
     // Jika ada file foto baru diunggah
     if ($request->hasFile('foto')) {
         // Hapus foto lama jika ada
-        if ($buku->foto && file_exists(public_path('uploads/' . $buku->foto))) {
-            unlink(public_path('uploads/' . $buku->foto));
+        if ($buku->foto && Storage::exists('storage/photos/' . $buku->foto)) {
+            Storage::delete('photos/' . $buku->foto);
         }
 
         // Upload foto baru
-        $file = $request->file('foto');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads'), $filename);
-        $buku->foto = $filename;
+        $filenameWithExt = $request->file('foto')->getClientOriginalName();
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        $extension = $request->file('foto')->getClientOriginalExtension();
+        $filenameToSave = $filename . '_' . time() . '.' . $extension;
+        $request->file('foto')->storeAs('photos', $filenameToSave);
+        $buku->foto = $filenameToSave;
     }
 
     $buku->save();
@@ -187,5 +194,10 @@ class BukuController extends Controller
 
         return redirect('/buku/index') -> with('successdel', 'Item deleted successfuly');
 
+    }
+
+    public function lihatgambar($filename)
+    {
+        return storage::get('public/').$filename;
     }
 }

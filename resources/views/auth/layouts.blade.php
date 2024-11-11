@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Laravel 10 Custom User Registration & Login Tutorial - AllPHPTricks.com</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('lightbox2/dist/css/lightbox.min.css')
+}}">
 </head>
 
 <body>
@@ -27,6 +29,10 @@
                         <li class="nav-item">
                             <a class="nav-link {{ (request()->is('register')) ? 'active' : '' }}" href="{{ route('register') }}">Register</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('gallery')) ? 'active' : '' }}" href="{{
+                           route('gallery.index') }}">Gallery</a>
+                        </li>
                     @else
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -42,6 +48,16 @@
                                 </li>
                             </ul>
                         </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('buku')) ? 'active' : '' }}" href="{{ route('buku.index') }}">Buku</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('gallery')) ? 'active' : '' }}" href="{{
+                           route('gallery.index') }}">Gallery</a>
+                        </li>
                     @endguest
                 </ul>
             </div>
@@ -53,6 +69,8 @@
         @yield('content')
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="{{ asset('lightbox2/dist/js/lightbox-plus-jquery.min.js')
+}}"></script>
 </body>
 
 </html>

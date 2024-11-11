@@ -41,7 +41,7 @@
             @foreach($data_buku as $index => $Buku)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td><img src="{{ asset('uploads/'.$Buku -> foto) }}" alt="foto" style="width: 100px; height: 100px;"></td>
+                    <td><img src="{{ asset('storage/photos/'.$Buku -> foto) }}" alt="foto" style="width: 100px; height: 100px;"></td>
                     <td>{{ $Buku->judul }}</td>
                     <td>{{ $Buku->penulis }}</td>
                     <td>Rp. {{ number_format($Buku->harga, 2, ',', '.') }}</td>
