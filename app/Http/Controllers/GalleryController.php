@@ -2,27 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use App\Models\Post;
 
 class GalleryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar galeri dengan paginasi.
+     * Data diambil dari model Post yang memiliki atribut gambar.
      */
     public function index()
     {
-        $data = array(
+        $data = [
             'id' => "posts",
             'menu' => 'Gallery',
-            'galleries' => Post::where('picture', '!=',
-           '')->whereNotNull('picture')->orderBy('created_at', 'desc')->paginate(30)
-            );
-            return view('gallery.index')->with($data);
+            'galleries' => Post::where('picture', '!=', '')
+                ->whereNotNull('picture')
+                ->orderBy('created_at', 'desc')
+                ->paginate(30)
+        ];
+
+        return view('gallery.index')->with($data);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan halaman untuk membuat galeri baru.
      */
     public function create()
     {
@@ -30,7 +35,8 @@ class GalleryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan galeri baru ke dalam database.
+     * Gambar yang diunggah disimpan ke folder penyimpanan.
      */
     public function store(Request $request)
     {
@@ -38,51 +44,46 @@ class GalleryController extends Controller
             'title' => 'required|max:255',
             'description' => 'required',
             'picture' => 'image|nullable|max:1999'
-            ]);
-            if ($request->hasFile('picture')) {
-            $filenameWithExt = $request->file('picture')->getClientOriginalName();
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        ]);
+
+        if ($request->hasFile('picture')) {
             $extension = $request->file('picture')->getClientOriginalExtension();
             $basename = uniqid() . time();
-            $smallFilename = "small_{$basename}.{$extension}";
-            $mediumFilename = "medium_{$basename}.{$extension}";
-            $largeFilename = "large_{$basename}.{$extension}";
             $filenameSimpan = "{$basename}.{$extension}";
             $path = $request->file('picture')->storeAs('posts_image', $filenameSimpan);
-
-            // $request->file('picture')->storeAs('posts_image', $filenameSimpan);
-            } else {
+        } else {
             $filenameSimpan = 'noimage.png';
-            }
-            // dd($request->input());
-            $post = new Post;
-            $post->picture = $filenameSimpan;
-            $post->title = $request->input('title');
-            $post->description = $request->input('description');
-            $post->save();
-            return redirect('gallery')->with('success', 'Berhasil menambahkan data baru');
+        }
+
+        $post = new Post;
+        $post->picture = $filenameSimpan;
+        $post->title = $request->input('title');
+        $post->description = $request->input('description');
+        $post->save();
+
+        return redirect('gallery')->with('success', 'Berhasil menambahkan data baru');
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan detail galeri berdasarkan ID.
      */
     public function show(string $id)
     {
-        //
+        $gallery = Post::find($id);
+        return view('gallery.show', compact('gallery'));
     }
-
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan halaman untuk mengedit data galeri.
      */
     public function edit(string $id)
     {
         $gallery = Post::find($id);
-        // dd($gallery);
         return view('gallery.update', compact('gallery'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui data galeri berdasarkan input pengguna.
+     * Jika ada gambar baru yang diunggah, gambar lama akan dihapus.
      */
     public function update(Request $request, string $id)
     {
@@ -95,13 +96,10 @@ class GalleryController extends Controller
         $post = Post::find($id);
 
         if ($request->hasFile('picture')) {
-            // Hapus gambar lama jika ada
             if ($post->picture && $post->picture !== 'noimage.png') {
                 \Storage::delete('posts_image/' . $post->picture);
             }
 
-            // Simpan gambar baru
-            $filenameWithExt = $request->file('picture')->getClientOriginalName();
             $extension = $request->file('picture')->getClientOriginalExtension();
             $basename = uniqid() . time();
             $filenameSimpan = "{$basename}.{$extension}";
@@ -116,9 +114,8 @@ class GalleryController extends Controller
         return redirect('gallery')->with('success', 'Berhasil memperbarui data');
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * Menghapus galeri dari database berdasarkan ID.
      */
     public function destroy(string $id)
     {

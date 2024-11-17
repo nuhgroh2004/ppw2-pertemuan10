@@ -66,4 +66,5 @@ Route::resource('gallery', GalleryController::class);
 
 
 Route::put('/gallery/{id}', [GalleryController::class, 'update'])->name('gallery.update');
+Route::put('/gallery/{id}', [GalleryController::class, 'show'])->name('gallery.show');
 
