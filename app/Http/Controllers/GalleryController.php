@@ -71,6 +71,7 @@ class GalleryController extends Controller
     {
         $gallery = Post::find($id);
         return view('gallery.show', compact('gallery'));
+
     }
     /**
      * Menampilkan halaman untuk mengedit data galeri.
@@ -127,4 +128,21 @@ class GalleryController extends Controller
             return redirect('gallery')->with('error', 'Data tidak ditemukan');
         }
     }
+
+    // public function arry()
+    // {
+    //     $array = [
+    //         'key1' => 123,
+    //         'key2' => [
+    //             'asdasd','asdsad'
+    //         ]
+    //     ]
+
+    //     echo $array
+
+    //     $json = json_encode($array)
+
+    //     echo $json
+
+    // }
 }
